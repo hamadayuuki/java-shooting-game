@@ -34,6 +34,8 @@ public class Shooting {
         Random random = new Random();
 
         int score = 0;
+        int level = 0;
+        long levelUpTimer = 0;   // レベルの上がる時間
 
         while(isLoop) {
 
@@ -47,8 +49,10 @@ public class Shooting {
 
                 // ゲームスタート
                 case START:
-                    // 塗りつぶし
-                    // ShootingPanel の image を使い描画を行ってい
+                    // 初期化
+                    score = 0;
+                    level = 0;
+                    levelUpTimer = 0;
 
                     // START という文字列を描画
                     Font font = new Font("HG行書体" , Font.PLAIN , 40);
@@ -75,12 +79,18 @@ public class Shooting {
                         // 主人公の初期位置を初期化
                         playerX = 400;
                         playerY = 700;
+                        level = 0;
                     }
 
                     break;
                
                 // ゲーム中
                 case GAME:
+                    // レベルアップ, 10秒ごと
+                    if(System.currentTimeMillis() - levelUpTimer > 10 * 1000) {
+                        levelUpTimer = System.currentTimeMillis();
+                        level ++;
+                    }
 
                     // 主人公を描画
                     graphics.setColor(Color.BLACK);
@@ -115,7 +125,8 @@ public class Shooting {
                     }
 
                     // ランダムな位置に敵を発生させる
-                    if(random.nextInt(100) == 1) {
+                    // 条件? Trueの時 ： Falseの時
+                    if(random.nextInt(level<10 ? 30-level*2:10) == 1) {
                         enemyList.add(new Enemy(random.nextInt(800) , 0));
                     }
 
@@ -134,7 +145,7 @@ public class Shooting {
                             i--;
                         }
                         // 敵の弾を作成
-                        if(random.nextInt(50) == 1) {
+                        if(random.nextInt(level<10 ? 80-level*3:30) == 1) {
                             enemyBallList.add(new Ball(enemy.x , enemy.y));
                         }
 
@@ -167,6 +178,7 @@ public class Shooting {
                     graphics.setColor(Color.BLACK);
                     graphics.setFont(new Font("SansSerif" , Font.PLAIN , 20));
                     graphics.drawString("SCORE : " + score , 400 , 300);
+                    graphics.drawString("LEVEL : " + level , 400 , 350);
 
                     // 左移動
                     if( keyboard.isKeyPressed(KeyEvent.VK_LEFT) && 0 < playerX ) {
