@@ -45,23 +45,24 @@ public class Shooting {
             
             switch (screenType) {
 
-                // ゲームスタート画面でのプログラム
+                // ゲームスタート
                 case START:
                     // 塗りつぶし
                     // ShootingPanel の image を使い描画を行ってい
 
                     // START という文字列を描画
-                    graphics.setColor(Color.BLACK);
                     Font font = new Font("HG行書体" , Font.PLAIN , 40);
+                    graphics.setColor(Color.BLACK);
                     graphics.setFont(font);
                     FontMetrics metrics1 = graphics.getFontMetrics(font);
                     graphics.drawString("START" , 400 - (metrics1.stringWidth("START")/2) , 150);
 
                     // Press SPACE Key! という文字列を描画
+                    font = new Font("HG行書体" , Font.PLAIN , 20);
                     graphics.setColor(Color.RED);
                     graphics.setFont(font);
-                    FontMetrics metrics2 = graphics.getFontMetrics(font);
-                    graphics.drawString("Press SPACE Key!" , 400 - (metrics2.stringWidth("Press SPACE Key!")/2) , 200);
+                    metrics1 = graphics.getFontMetrics(font);
+                    graphics.drawString("Press SPACE Key!" , 400 - (metrics1.stringWidth("Press SPACE Key!")/2) , 200);
 
                     // スペースキー押されたら画面遷移
                     // ゲーム開始
@@ -108,7 +109,7 @@ public class Shooting {
                                 j--;
                                 playerBallList.remove(i);   // 主人公の弾 を削除
                                 i--;
-                                score += 1;
+                                score += 1;   // スコアを増やす
                             }
                         }
                     }
@@ -136,6 +137,11 @@ public class Shooting {
                         if(random.nextInt(50) == 1) {
                             enemyBallList.add(new Ball(enemy.x , enemy.y));
                         }
+
+                         // ゲームオーバー時の判定
+                         if( (enemy.x >= playerX && enemy.x <= playerX+30 && enemy.y>=playerY && enemy.y<=playerY+20) || (enemy.x+30 >= playerX && enemy.x+30 <= playerX+30 && enemy.y+20>=playerY && enemy.y+20<=playerY+20) ) {
+                            screenType = ShootingScreenEnum.GAMEOVER;
+                        }
                     }
 
                     // 敵の弾を全てを描画する
@@ -149,6 +155,11 @@ public class Shooting {
                         if (enemyBall.y < 0) {
                             enemyBallList.remove(i);
                             i--;
+                        }
+
+                        // ゲームオーバー時の判定
+                        if(enemyBall.x >= playerX && enemyBall.x <= playerX+30 && enemyBall.y>=playerY && enemyBall.y<=playerY+20) {
+                            screenType = ShootingScreenEnum.GAMEOVER;
                         }
                     }
 
@@ -180,14 +191,42 @@ public class Shooting {
 
                     break;
 
+                // ゲームオーバー
                 case GAMEOVER:
+                    // 塗りつぶし
+                    // ShootingPanel の image を使い描画を行ってい
+
+                    // Game Over という文字列を描画
+                    font = new Font("HG行書体" , Font.PLAIN , 40);
+                    graphics.setColor(Color.BLACK);
+                    graphics.setFont(font);
+                    metrics1 = graphics.getFontMetrics(font);
+                    graphics.drawString("Game Over" , 400 - (metrics1.stringWidth("Game Over")/2) , 150);
+
+                    // Your Score ? という文字列を描画
+                    font = new Font("HG行書体" , Font.PLAIN , 20);
+                    graphics.setFont(font);
+                    metrics1 = graphics.getFontMetrics(font);
+                    graphics.drawString("Your Score" + score , 400 - (metrics1.stringWidth("Your Score" + score)/2) , 250);
+                    
+                    // Press SPACE Key! という文字列を描画
+                    font = new Font("HG行書体" , Font.PLAIN , 40);
+                    graphics.setColor(Color.RED);
+                    graphics.setFont(font);
+                    metrics1 = graphics.getFontMetrics(font);
+                    graphics.drawString("Press ESC to Return Start Screen" , 400 - (metrics1.stringWidth("Press ESC to Return Start Screen")/2) , 400);
+
+                    // スペースキー押されたら画面遷移
+                    // ゲーム開始
+                    if(keyboard.isKeyPressed(KeyEvent.VK_ESCAPE)) {
+                        screenType = ShootingScreenEnum.START;
+                    }
                     break;
 
             }
 
             startTime = System.currentTimeMillis();
             
-
             // 描画
             // バッファした結果を表示
             shootingFrame.panel.draw();
