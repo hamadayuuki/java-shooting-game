@@ -16,7 +16,7 @@ public class Ball extends Panel {
     }
 
     public void move() {
-        if(y >= 680) {
+        if(y <= 0) {
             y = 1000;
         } else {
             y -= 20;
