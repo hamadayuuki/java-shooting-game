@@ -7,12 +7,12 @@ import java.util.Random;
 
 // 上下左右に動く, 弾を発射する
 public class Player extends Panel{
-    public static Keyboard keyboard = new Keyboard();
     Toolkit toolkit = Toolkit.getDefaultToolkit();
     Image playerImage = toolkit.getImage(getClass().getResource("Pic/Player.png"));
-    public int x = 100;
-    public int y = 300;
-    public static boolean l_down,r_down,u_down,d_down;
+
+    static public int x = 100;
+    static public int y = 300;
+    public static boolean l_down, r_down, u_down, d_down;
 
     public Player() { }
 
@@ -28,9 +28,14 @@ public class Player extends Panel{
     	if(r_down) x += 10;
     	if(u_down) y -= 10;
     	if(d_down) y += 10;
+        confirmContactWithEnemy();
     }
 
-    public void addBall() {
-        
+    public void confirmContactWithEnemy() {
+        for(Enemy e: shootingPanel.enemyList) {
+            if((e.x <= x && x <= e.x + 40) && (e.y <= y && y <= e.y + 25)) {
+                hp.hp -= 1;
+            }
+        }
     }
 }

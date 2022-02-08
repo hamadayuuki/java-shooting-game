@@ -9,6 +9,7 @@ public class ShootingPanel extends Panel implements Runnable, KeyListener{
 
     public BufferedImage image;   // 自分で画像を指定する
     static public Vector<Enemy> enemyList;   // static 変数, クラス内・外共有可能な変数にする必要がある, public ShootingPanel() では宣言しない(他のクラスの宣言時初期化されるから)
+    static public ArrayList<Ball> playerBallList = new ArrayList<>();
 
     Thread runner;		// 実行用スレッド
 
@@ -17,6 +18,10 @@ public class ShootingPanel extends Panel implements Runnable, KeyListener{
   	Graphics offg;		// そのグラフィックス
 
     Player player = new Player();
+    Ball ball = new Ball();
+    HP hp = new HP();
+
+    public boolean isPressedSpaceKey = false;
 
     public ShootingPanel() {
         //super();
@@ -39,7 +44,9 @@ public class ShootingPanel extends Panel implements Runnable, KeyListener{
     	while(runner!=null){
             moveAllEnemy();
             movePlayer();
+            movePlayerBall();
             repaint();   // update() を呼び出す
+            //System.out.println(playerBallList);
             try{
                 runner.sleep(50);
             }	
@@ -74,11 +81,23 @@ public class ShootingPanel extends Panel implements Runnable, KeyListener{
         System.out.println("delete Enemy");
 	}
 
+    // 主人公の移動
     public void movePlayer() {
         player.move();
     }
+    // 主人公の弾を作成, Player.java から呼ばれる
+    public void addPlayerBall() {
+        System.out.println("addPlayerBall");
+        playerBallList.add(new Ball());
+    }
 
-    // 描画
+    public void movePlayerBall() {
+        for(Ball ball:playerBallList) {
+            ball.move();
+        }
+    }
+
+    // 画面の描画を行う
     public void update(Graphics g){ 
         paint(g);
     }
@@ -100,6 +119,12 @@ public class ShootingPanel extends Panel implements Runnable, KeyListener{
         }
         // 主人公の描画
         player.draw(offg);
+        // 主人公の弾を描画
+        for(Ball ball: playerBallList) {
+            ball.draw(offg);
+        }
+        // HPの描画
+        hp.draw(offg);
 
         g.drawImage(off , 0 , 0 , null);
     }
@@ -115,7 +140,12 @@ public class ShootingPanel extends Panel implements Runnable, KeyListener{
 		case KeyEvent.VK_DOWN: player.d_down = true; break;
 		case KeyEvent.VK_LEFT: player.l_down = true; break;
 		case KeyEvent.VK_RIGHT: player.r_down = true; break;
-		case KeyEvent.VK_SPACE: System.out.println("空白 UP"); break;
+		case KeyEvent.VK_SPACE: 
+            if(!isPressedSpaceKey) {
+                addPlayerBall();
+                isPressedSpaceKey = true;
+            }
+            break;
 		}
 	}
 	// キーを離した時
@@ -127,7 +157,9 @@ public class ShootingPanel extends Panel implements Runnable, KeyListener{
 		case KeyEvent.VK_DOWN: player.d_down = false; break;
 		case KeyEvent.VK_LEFT: player.l_down = false; break;
 		case KeyEvent.VK_RIGHT: player.r_down = false; break;
-		case KeyEvent.VK_SPACE: System.out.println("空白 Down"); break;
+		case KeyEvent.VK_SPACE: 
+            isPressedSpaceKey = false;
+            break;
 		}
 
 	}
