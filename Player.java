@@ -12,7 +12,10 @@ public class Player extends Panel{
 
     static public int x = 100;
     static public int y = 300;
-    public static boolean l_down, r_down, u_down, d_down;
+    static public boolean l_down, r_down, u_down, d_down;
+
+    public HP hp = new HP();
+    public ShootingPanel shootingPanel;
 
     public Player() { }
 
@@ -28,13 +31,21 @@ public class Player extends Panel{
     	if(r_down) x += 10;
     	if(u_down) y -= 10;
     	if(d_down) y += 10;
+
+        if(y <= 0) y = 0;
+        if(y >= 720) y = 720;
+        if(x <= 0) x = 0;
+        if(x >= 750) x = 750;
+
         confirmContactWithEnemy();
     }
 
-    public void confirmContactWithEnemy() {
+    private void confirmContactWithEnemy() {
         for(Enemy e: shootingPanel.enemyList) {
             if((e.x <= x && x <= e.x + 40) && (e.y <= y && y <= e.y + 25)) {
-                hp.hp -= 1;
+                e.x = 2000;
+                e.y = 2000;
+                hp.decreaseHp(1);
             }
         }
     }

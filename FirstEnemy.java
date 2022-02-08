@@ -17,11 +17,15 @@ public class FirstEnemy extends Enemy {
 
     // 縦移動
     public void move(){
-        y += 10;
-        // 画面外へ移動
+        
+        // 画面外の時
         if(y >= 500) {
-            x = 1000;
-            y = 1000;
+            x = 2000;
+            y = 2000;
+        } 
+        // 画面内の時
+        else {
+            y += 10;
         }
     }
     

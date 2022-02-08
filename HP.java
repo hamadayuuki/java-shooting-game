@@ -8,7 +8,11 @@ public class HP extends Panel {
     int x = 700;
     int y = 50;
 
-    int hp = 5;
+    static public int hp;
+
+    public HP() {
+        hp = 5;
+    }
 
     public void draw(Graphics g) {
         for(int i = 0; i < hp; i++) {

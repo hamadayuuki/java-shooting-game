@@ -6,13 +6,12 @@ public class Ball extends Panel {
 
     public int x , y;
 
-    Player player;
+    static Player player;
 
     public ShootingPanel shootingPanel;   // 変数の参照なら、これだけで良い
 
     public Ball() { 
-        player = new Player();
-        x = player.x;
+        x = player.x + 20;
         y = player.y;
     }
 
@@ -28,7 +27,10 @@ public class Ball extends Panel {
     public void confirmContactWithEnemy() {
         for(Enemy e: shootingPanel.enemyList) {
             if((e.x <= x && x <= e.x + 40) && (e.y <= y && y <= e.y + 25)) {
+                x = 1000;
                 y = 1000;
+
+                e.x = 2000;
                 e.y = 2000;
             }
         }
