@@ -2,19 +2,15 @@
 import java.awt.event.*;
 import java.util.ArrayList;
 
-
-
 // ShootingFrame にて宣言済み
-public class Keyboard extends KeyAdapter {
+public class Keyboard extends KeyAdapter{
 
     public static ArrayList<Integer> inputStrList = new ArrayList<>();
     
     // 初期化
-    public Keyboard() {
-        
-    }
+    public Keyboard() { }
 
-    public static boolean isKeyPressed(int keyCode) {
+    public boolean isKeyPressed(int keyCode) {
         return inputStrList.contains(keyCode);
     }
 
@@ -29,7 +25,6 @@ public class Keyboard extends KeyAdapter {
         if( !inputStrList.contains(e.getKeyCode() )) {
             inputStrList.add( e.getKeyCode() );
         }
-
     }
 
     // キーから手が離れた時
@@ -37,5 +32,4 @@ public class Keyboard extends KeyAdapter {
     public void keyReleased(KeyEvent e) {
         inputStrList.remove( (Integer)e.getKeyCode() );
     }
-    
 }

@@ -1,3 +1,10 @@
+/*
+
+    ・画面の生成
+    ・ShootingPanel を呼び出す
+        → ShootingPanel から他の画面を呼び出している
+
+*/
 
 import java.awt.*;
 import java.awt.event.*;
@@ -5,18 +12,41 @@ import java.util.ArrayList;
 import java.util.Random;
 
 
-public class Shooting {
+public class Shooting extends Frame implements KeyListener{
     public static ShootingFrame  shootingFrame;
     public static boolean isLoop;
-    
     public static Keyboard keyboard;
+    public static ShootingPanel shootingPanel;    // 敵の生成や削除,描画
+    public static EnemyController EnemyController;
 
-    public static void main(String[] args) {
+    public Shooting() {
 
+        // 画面を描画する
+        shootingPanel = new ShootingPanel();
+        add(shootingPanel);
+		shootingPanel.start();
+        
+        // 敵の生成を行う
+        EnemyController = new EnemyController();
+		EnemyController.start();
+        
+
+        //KeyListener の登録
+		addKeyListener(this);
+		addWindowListener( new WindowEventHandler() );
+
+        // 主人公の生成
+
+        
+        //shootingFrame = new ShootingFrame();
+
+        /*
         shootingFrame = new ShootingFrame();
         isLoop = true;
-
+        
         Graphics graphics = shootingFrame.panel.image.getGraphics();   // 左上(0,0) , 右下(X_Max,Y_Max)
+        shootingPanel = new ShootingPanel();
+        shootingPanel.start();
     
         long startTime;
         int fps = 30;
@@ -36,13 +66,17 @@ public class Shooting {
         int score = 0;
         int level = 0;
         long levelUpTimer = 0;   // レベルの上がる時間
+        int playerHp = 5;
+        int enemyType = 0;   // 敵の種類
+        
+        // 背景
+        // ShootingPanel の image を使い描画を行っている
+        graphics.setColor(Color.WHITE);
+        graphics.fillRect(0 , 0 , 800 , 800);
 
         while(isLoop) {
 
-            // 背景
-            // ShootingPanel の image を使い描画を行っている
-            graphics.setColor(Color.WHITE);
-            graphics.fillRect(0 , 0 , 800 , 800);
+            
 
             
             switch (screenType) {
@@ -75,6 +109,7 @@ public class Shooting {
 
                         playerBallList = new ArrayList<>();
                         enemyBallList = new ArrayList<>();
+                        enemyList = new ArrayList<>();
 
                         // 主人公の初期位置を初期化
                         playerX = 400;
@@ -96,6 +131,7 @@ public class Shooting {
                     graphics.setColor(Color.BLACK);
                     graphics.fillRect(playerX+20 , playerY-10 , 10 , 10);   // 本体_上
                     graphics.fillRect(playerX , playerY , 50 , 15);   // 本体_下
+                    
 
                     // 作成したボール全てを描画する
                     //for(Ball ball : ballList) {
@@ -127,7 +163,8 @@ public class Shooting {
                     // ランダムな位置に敵を発生させる
                     // 条件? Trueの時 ： Falseの時
                     if(random.nextInt(level<10 ? 30-level*2:10) == 1) {
-                        enemyList.add(new Enemy(random.nextInt(800) , 0));
+                        //enemyList.add(new Enemy(random.nextInt(800) , 0));
+                        shootingPanel.addEnemy(enemyType);
                     }
 
                     // 敵を全て表示
@@ -139,19 +176,24 @@ public class Shooting {
                         graphics.fillRect(enemy.x , enemy.y , 30 , 10);
                         graphics.fillRect(enemy.x + 10 , enemy.y + 10 , 10 , 10);
                         enemy.y += 10;
+
                         // 画面外にいくと敵を削除
                         if (enemy.y > 800) {
                             enemyList.remove(i);
                             i--;
                         }
+
                         // 敵の弾を作成
                         if(random.nextInt(level<10 ? 80-level*3:30) == 1) {
                             enemyBallList.add(new Ball(enemy.x , enemy.y));
                         }
 
-                         // ゲームオーバー時の判定
+                         // 敵 と 主人公 の当たり判定
                          if( (enemy.x >= playerX && enemy.x <= playerX+30 && enemy.y>=playerY && enemy.y<=playerY+20) || (enemy.x+30 >= playerX && enemy.x+30 <= playerX+30 && enemy.y+20>=playerY && enemy.y+20<=playerY+20) ) {
-                            screenType = ShootingScreenEnum.GAMEOVER;
+                            playerHp -= 1;
+                            if (playerHp <= 0) {
+                                screenType = ShootingScreenEnum.GAMEOVER;
+                            }
                         }
                     }
 
@@ -162,15 +204,19 @@ public class Shooting {
                         graphics.setColor(Color.RED);
                         graphics.fillRect(enemyBall.x , enemyBall.y , 5 , 5);
                         enemyBall.y += 20;
+
                         // 画面外にいくと弾を削除
                         if (enemyBall.y < 0) {
                             enemyBallList.remove(i);
                             i--;
                         }
 
-                        // ゲームオーバー時の判定
+                        // 敵の弾 と 主人公 の当たり判定
                         if(enemyBall.x >= playerX && enemyBall.x <= playerX+30 && enemyBall.y>=playerY && enemyBall.y<=playerY+20) {
-                            screenType = ShootingScreenEnum.GAMEOVER;
+                            playerHp -= 1;
+                            if (playerHp <= 0) {
+                                screenType = ShootingScreenEnum.GAMEOVER;
+                            }
                         }
                     }
 
@@ -180,6 +226,14 @@ public class Shooting {
                     graphics.drawString("SCORE : " + score , 400 , 300);
                     graphics.drawString("LEVEL : " + level , 400 , 350);
 
+                    // 上移動
+                    if( keyboard.isKeyPressed(KeyEvent.VK_UP) && 0 < playerX ) {
+                        playerY -= 10;
+                    }
+                    // 下移動
+                    if( keyboard.isKeyPressed(KeyEvent.VK_DOWN) && playerX < (800-50) ) {
+                        playerY += 10;
+                    }
                     // 左移動
                     if( keyboard.isKeyPressed(KeyEvent.VK_LEFT) && 0 < playerX ) {
                         playerX -= 10;
@@ -256,6 +310,75 @@ public class Shooting {
             //System.out.println(System.currentTimeMillis() - startTime);   // 実行時間を計測
             
         }
+        */
     }
-    
+
+    // KeyEventの登録
+	// キーを押しているとき
+	@Override
+	public void keyPressed( KeyEvent e ){
+		int  command = e.getKeyCode();
+		switch( command ){
+		case KeyEvent.VK_UP:
+			System.out.println("↑ UP");
+			break;
+		case KeyEvent.VK_DOWN:
+			System.out.println("↓ UP");
+		case KeyEvent.VK_LEFT:
+			System.out.println("← UP");
+			break;
+		case KeyEvent.VK_RIGHT:
+			System.out.println("→ UP");
+			break;
+		case KeyEvent.VK_SPACE:
+			System.out.println("空白 UP");
+			break;
+		}
+	}
+	
+	// キーを離した時
+	@Override
+	public void keyReleased( KeyEvent e ){
+		int  command = e.getKeyCode();
+		switch( command ){
+		case KeyEvent.VK_UP:
+			System.out.println("↑ DOWS");
+			break;
+		case KeyEvent.VK_DOWN:
+			System.out.println("↓ DOWN");
+		case KeyEvent.VK_LEFT:
+			System.out.println("← DOWN");
+			break;
+		case KeyEvent.VK_RIGHT:
+			System.out.println("→ DOWN");
+			break;
+		case KeyEvent.VK_SPACE:
+			System.out.println("空白 DOWN");
+			break;
+		}
+
+	}
+	
+	// 以下はこのプログラムでは未使用
+	// ただし，何もしなくてもOverrideする必要がある．
+	@Override
+	public void keyTyped( KeyEvent e ){
+
+	}
+
+    public static void main( String [] args ){
+		Shooting appli = new Shooting();
+		// サイズ設定、可視化
+		appli.setSize( 800, 800 );
+		appli.setVisible( true );
+
+	}
 }
+
+// アプリケーション用のウインドウリスナー
+class WindowEventHandler extends WindowAdapter {
+    public void windowClosing( WindowEvent ev ){
+      System.exit(0);
+    }
+  }
+  
