@@ -7,17 +7,21 @@ public class HP extends Panel {
     // 画面左上
     int x = 700;
     int y = 50;
+    int width = 40;
+    int height = 40;
 
-    static public int hp = 5;
+    static public int hp = 10;
 
     public HP() { }
 
+    // 描画
     public void draw(Graphics g) {
         for(int i = 0; i < hp; i++) {
-            g.drawImage(hpImage, x - (i*45), y, 50, 50, this);
+            g.drawImage(hpImage, x - (i*(width - 5)), y, width, height, this);
         }
     }
 
+    // HPの減少
     public void decreaseHp(int decreaseNum) {
         // HPが0以下にならないようにする
         if(hp - decreaseNum >= 0) {
@@ -28,6 +32,7 @@ public class HP extends Panel {
     }
 
     public void resetHp() {
-        hp = 5;
+        hp = 10;
     }
+
 }

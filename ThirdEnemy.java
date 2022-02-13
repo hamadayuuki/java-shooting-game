@@ -1,30 +1,32 @@
 import java.util.Random;
 import java.awt.*;
 
-public class FirstEnemy extends Enemy {
+public class ThirdEnemy extends Enemy {
 
     Toolkit toolkit = Toolkit.getDefaultToolkit();
-    Image img = toolkit.getImage(getClass().getResource("Pic/FirstEnemy.png"));
+    Image img = toolkit.getImage(getClass().getResource("Pic/ThirdEnemy.png"));
+    
+    public ThirdEnemy() {
 
-    public FirstEnemy() {
-        
-        type = 0;   // 敵の種類
-        
+        type = 2;   // 敵の種類
+
         // 初期座標
-        x = random.nextInt(750);
-        y = 0;
+        x = random.nextInt(680);
+        y = 150;
 
         // 大きさ
-        width = 50;
-        height = 50;
+        width = 100;
+        height = 100;
 
         // 変化量
-        dx = 0;
-        dy = 10;
+        int randomNum = random.nextInt(2);
+        if (randomNum == 0) dx = 10;
+        else dx = -10;
+        dy = 2;
 
         addEnemyBallCount = 0;
-        addEnemyBallEndPoint = 50;
-        dScore = 1;
+        addEnemyBallEndPoint = 10;
+        dScore = 5;
     }
 
     public void draw(Graphics g) {
@@ -40,19 +42,23 @@ public class FirstEnemy extends Enemy {
             callAddEnemyBall();
         }
         
-        // 画面外の時, 削除の関数を呼び出す
+        // 画面外の時, 削除の関数 を呼び出す
         if(y >= 800) {
             shootingPanel.deleteEnemy(this);
         } 
         // 画面内の時, 移動
         else {
+            x += dx;
             y += dy;
+            if (x <= 0 || x >= 800 - width -30) {
+                dx *= -1;
+            }
         }
     }
 
     // 敵の弾生成を呼び出す
     public void callAddEnemyBall() {
-        shootingPanel.addEnemyBall(this, 0);
+        shootingPanel.addEnemyBall(this, 2);
     }
     
 }

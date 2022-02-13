@@ -1,42 +1,44 @@
 import java.awt.*;
 
-public class EnemyBall extends Panel {
-    Toolkit toolkit = Toolkit.getDefaultToolkit();
-    Image playerImage = toolkit.getImage(getClass().getResource("Pic/Ball.png"));
+public abstract class EnemyBall extends Panel {
 
     public int x , y;
+    int dx, dy;
+    int width, height;
+    int type;
+
     static Enemy enemy;
-    public ShootingPanel shootingPanel;   // 変数の参照なら、これだけで良い
+    static ShootingPanel shootingPanel = new ShootingPanel();
     public HP hp = new HP();
     public Player player;
 
-    public EnemyBall(int enemyX, int enemyY) { 
-        x = enemyX;
-        y = enemyY;
-        System.out.println(x);
-        System.out.println(y);
-    }
+    public EnemyBall() { }
 
-    public void move() {
-        if(y <= 0) {
-            y = 1000;
-        } else {
-            y += 20;
-            confirmContactWithPlayer();
-        }
-    }
+    public abstract void move();
+    public abstract void draw(Graphics g);
 
+    // プレイヤー との衝突判定
     public void confirmContactWithPlayer() {
-        if((player.x <= x && x <= player.x + 40) && (player.y <= y && y <= player.y + 25)) {
-            x = 1000;
-            y = 1000;
-
-            hp.decreaseHp(1);
+        if(((player.x - width) <= x && x <= player.x + player.width) && (player.y <= y && y <= player.y + player.height)) {
+            shootingPanel.deleteEnemyBall(this);   // 敵の弾を削除
+            if (this.type == 0 || this.type == 1) {
+                hp.decreaseHp(1);   // HP減少
+            } else if (this.type == 2) {
+                hp.decreaseHp(2);   // HP減少
+            }
         }
     }
 
-    public void draw(Graphics g) {
-        // Ball.png(360×600 : 3:10)
-        g.drawImage(playerImage, x, y, 12, 40, this);
+    // 主人公の弾 との衝突判定
+    public void confirmContactWithPlayerBall() {
+        Ball ball;
+        for (int i = 0; i < shootingPanel.playerBallList.size(); i++) {
+            ball = shootingPanel.playerBallList.get(i);
+            if(((ball.x - width) <= x && x <= ball.x + ball.width) && (ball.y <= y && y <= ball.y + ball.height + 10)) {
+                shootingPanel.deleteEnemyBall(this);   // 敵の弾を削除
+                shootingPanel.deletePlayerBall(ball);
+            }
+        }
     }
+
 }

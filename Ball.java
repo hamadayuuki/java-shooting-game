@@ -8,36 +8,42 @@ public class Ball extends Panel {
 
     static Player player;
 
-    public ShootingPanel shootingPanel;   // 変数の参照なら、これだけで良い
+    static ShootingPanel shootingPanel = new ShootingPanel();
+
+    int width, height;
 
     public Ball() { 
         x = player.x + 20;
         y = player.y;
+
+        width = 12;
+        height = 40;
     }
 
     public void move() {
         if(y <= 0) {
-            y = -1000;
+            shootingPanel.deletePlayerBall(this);
         } else {
             y -= 20;
             confirmContactWithEnemy();
         }
     }
 
+    // 敵との衝突判定
     public void confirmContactWithEnemy() {
-        for(Enemy e: shootingPanel.enemyList) {
-            if((e.x <= x && x <= e.x + 40) && (e.y <= y && y <= e.y + 25)) {
-                x = -1000;
-                y = -1000;
-
-                e.x = 2000;
-                e.y = 2000;
+        Enemy e;
+        for(int i = 0; i < shootingPanel.enemyList.size(); i++) {
+            e = shootingPanel.enemyList.get(i);
+            if(((e.x - width) <= x && x <= e.x + e.width) && (e.y <= y && y <= e.y + e.height)) {
+                shootingPanel.score += e.dScore;
+                shootingPanel.deletePlayerBall(this);   // 主人公の弾を削除
+                shootingPanel.deleteEnemy(e);   // 敵を削除
             }
         }
     }
 
     public void draw(Graphics g) {
-        // Ball.png(360×600 : 3:10)
-        g.drawImage(playerImage, x, y, 12, 40, this);
+        g.drawImage(playerImage, x, y, width, height, this);
     }
+
 }
