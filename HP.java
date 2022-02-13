@@ -8,11 +8,9 @@ public class HP extends Panel {
     int x = 700;
     int y = 50;
 
-    static public int hp;
+    static public int hp = 5;
 
-    public HP() {
-        hp = 5;
-    }
+    public HP() { }
 
     public void draw(Graphics g) {
         for(int i = 0; i < hp; i++) {
@@ -27,6 +25,9 @@ public class HP extends Panel {
         } else {
             hp = 0;
         }
-        
+    }
+
+    public void resetHp() {
+        hp = 5;
     }
 }

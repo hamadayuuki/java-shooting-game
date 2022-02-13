@@ -17,7 +17,7 @@ public class Ball extends Panel {
 
     public void move() {
         if(y <= 0) {
-            y = 1000;
+            y = -1000;
         } else {
             y -= 20;
             confirmContactWithEnemy();
@@ -27,8 +27,8 @@ public class Ball extends Panel {
     public void confirmContactWithEnemy() {
         for(Enemy e: shootingPanel.enemyList) {
             if((e.x <= x && x <= e.x + 40) && (e.y <= y && y <= e.y + 25)) {
-                x = 1000;
-                y = 1000;
+                x = -1000;
+                y = -1000;
 
                 e.x = 2000;
                 e.y = 2000;

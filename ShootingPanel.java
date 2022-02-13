@@ -8,8 +8,9 @@ import java.util.*;
 public class ShootingPanel extends Panel implements Runnable, KeyListener{
 
     public BufferedImage image;   // 自分で画像を指定する
-    static public Vector<Enemy> enemyList;   // static 変数, クラス内・外共有可能な変数にする必要がある, public ShootingPanel() では宣言しない(他のクラスの宣言時初期化されるから)
+    static public Vector<Enemy> enemyList = new Vector<>();;   // static 変数, クラス内・外共有可能な変数にする必要がある, public ShootingPanel() では宣言しない(他のクラスの宣言時初期化されるから)
     static public ArrayList<Ball> playerBallList = new ArrayList<>();
+    static public ArrayList<EnemyBall> enemyBallList = new ArrayList<>();
 
     Thread runner;		// 実行用スレッド
 
@@ -19,6 +20,7 @@ public class ShootingPanel extends Panel implements Runnable, KeyListener{
 
     Player player = new Player();
     Ball ball = new Ball();
+    EnemyBall enemyBall;
     HP hp = new HP();
 
     public boolean isPressedSpaceKey = false;
@@ -42,9 +44,10 @@ public class ShootingPanel extends Panel implements Runnable, KeyListener{
     public void run(){
         
     	while(runner!=null){
-            moveAllEnemy();
-            movePlayer();
-            movePlayerBall();
+            moveAllEnemy();   // 敵の移動
+            movePlayer();   // 主人公の移動
+            movePlayerBall();   // 主人公の弾移動
+            moveAllEnemyBall();   // 敵の弾移動
             repaint();   // update() を呼び出す
             //System.out.println(playerBallList);
             try{
@@ -65,10 +68,16 @@ public class ShootingPanel extends Panel implements Runnable, KeyListener{
         }
     }
 
-    // 敵を生成
+    // 敵と敵の弾を生成
     public void addEnemy( int enemyType ){
 		switch(enemyType){
-      		case 0: enemyList.addElement(new FirstEnemy()); break;
+      		case 0: 
+              enemyList.addElement(new FirstEnemy()); 
+              System.out.println(enemyList.size());
+              if(enemyList.size() > 0) {
+                addEnemyBall(enemyList.get(enemyList.size()-1));
+              }
+              break;
       		// case 1: circles.addElement(new WarpCircle()); break;
       		// case 2: circles.addElement(new ThroughCircle()); break;
 			// case 3: circles.addElement(new HorizontalCircle()); break;
@@ -90,10 +99,19 @@ public class ShootingPanel extends Panel implements Runnable, KeyListener{
         System.out.println("addPlayerBall");
         playerBallList.add(new Ball());
     }
-
     public void movePlayerBall() {
         for(Ball ball:playerBallList) {
             ball.move();
+        }
+    }
+
+    // 敵の弾を作成
+    public void addEnemyBall(Enemy enemy) {
+        enemyBallList.add(new EnemyBall(enemy.x, enemy.y));
+    }
+    public void moveAllEnemyBall() {
+        for(EnemyBall enemyBall:enemyBallList) {
+           enemyBall.move();
         }
     }
 
@@ -125,6 +143,10 @@ public class ShootingPanel extends Panel implements Runnable, KeyListener{
         }
         // HPの描画
         hp.draw(offg);
+        // 敵の弾を描画
+        for(EnemyBall enemyBall: enemyBallList) {
+            enemyBall.draw(offg);
+        }
 
         g.drawImage(off , 0 , 0 , null);
     }
